@@ -1,0 +1,228 @@
+﻿@{ Layout = "~/Views/Shared/Layout/_Layout.cshtml"; }
+
+<head>
+    <partial name="~/Views/Shared/PartialViews/_Meta.cshtml">
+
+        <title>Ana Sayfa</title>
+
+        <!-- Custom fonts for this template-->
+        <link href="~/Content/sb-admin-2/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
+        <!-- Custom styles for this template-->
+        <link href="~/Content/sb-admin-2/css/sb-admin-2.css" rel="stylesheet" />
+
+        <!--toastr style-->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.css" rel="stylesheet" />
+        <!--toastr script-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto mb-2">
+
+                        <li class="topbar-divider d-none d-sm-block"></li>
+
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="aUserDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small"></span>
+                                <div class="sidebar-brand-icon rotate-n-15">
+                                    <i class="fas fa-laugh-wink" style="color: #2e59d9"></i>
+                                </div>
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="aUserDropdown">
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#mdlLogout">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Çıkış
+                                </a>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </nav>
+                <!-- End of Topbar -->
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <!-- #region drag drop area -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Yapılacaklar</h6>
+                                </div>
+                                <div id="divToDo" class="card-body" ondrop="drop($(this))" ondragover="allowDrop(event)">
+                                    <ul>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Beklemede Olanlar</h6>
+                                </div>
+                                <div id="divOnHold" class="card-body" dropzone="true" ondrop="drop($(this))" ondragover="allowDrop(event)">
+                                    <ul>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                                    <h6 class="m-0 font-weight-bold text-primary">Tamamlananlar</h6>
+                                </div>
+                                <div id="divFinished" class="card-body" dropzone="true" ondrop="drop($(this))" ondragover="allowDrop(event)">
+                                    <ul>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- #endregion -->
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    <!-- Scroll to Top Button-->
+    <!--<a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>-->
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="mdlLogout" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Çıkmak istediğinizden emin misiniz?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                @*<div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>*@
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">İptal</button>
+                    <a class="btn btn-primary" href="#" onclick="Logout()">Evet</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            CheckIfTokenExists();
+
+            $("#aUserDropdown span").html("Hoşgeldin " + localStorage.getItem("userName"));
+
+            GetResponsibledAssignments();
+        });
+
+
+        function CheckIfTokenExists() {
+            var tokenString = localStorage.getItem("token");
+
+            if (tokenString == null || tokenString == "" || tokenString == undefined) {
+                Logout();
+            }
+        }
+
+        function GetResponsibledAssignments() {
+            $.ajax(
+                {
+                    type: "get",
+                    url: "/api/Task/GetUsersTasks?UserId=" + localStorage.getItem("userId"),
+                    headers: { 'Authorization': 'Bearer ' + localStorage.getItem("token") },
+                    success: function (data) {
+                        console.log(data.data)
+                        if (data.isSuccess) {
+                            $.each(data.data, function (key, value) {
+                                var currentHtml = '<li draggable="true" ondragstart="drag($(this))">' + value.taskText + '</li>';
+
+                                if (value.statue == 1) {
+                                    $("#divToDo ul").append(currentHtml)
+                                }
+                                else if (value.statue == 2) {
+                                    $("#divOnHold ul").append(currentHtml)
+                                }
+                                else if (value.statue == 3) {
+                                    $("#divFinished ul").append(currentHtml)
+                                }
+                            })
+                        }
+                        else
+                            toastr["warning"]("Listede Görev Mevcut Değildir")
+                    },
+                    error: function () {
+                        toastr["error"]("Listeye Erişim Esnasında Hata Oluştu")
+                    }
+                }
+            )
+        }
+
+        function Logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userName");
+
+            window.location.href = "/Account/Login";
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        var currentObject;
+
+        function drag(element) {
+            currentObject = element;
+        }
+
+        function drop(element) {
+            element.find("ul").append(currentObject);
+        }
+    </script>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="~/Content/sb-admin-2/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Content/sb-admin-2/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="~/Content/sb-admin-2/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="~/Content/sb-admin-2/js/sb-admin-2.min.js"></script>
+
+    <!-- Page level plugins -->
+    <script src="~/Content/sb-admin-2/vendor/chart.js/Chart.min.js"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="~/Content/sb-admin-2/js/demo/chart-area-demo.js"></script>
+    <script src="~/Content/sb-admin-2/js/demo/chart-pie-demo.js"></script>
+
+</body>
